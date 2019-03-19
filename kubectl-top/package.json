@@ -1,0 +1,46 @@
+{
+    "name": "kubectl-top",
+    "displayName": "kubectl-top",
+    "description": "Adds a 'Top' command to Kubernetes nodes and pods",
+    "version": "0.0.1",
+    "publisher": "ms-kubernetes-tools",
+    "engines": {
+        "vscode": "^1.32.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:k8stop.top"
+    ],
+    "main": "./out/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "k8stop.top",
+                "title": "Show Resource Usage",
+                "category": "Kubernetes"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.6",
+        "tslint": "^5.8.0",
+        "@types/node": "^7.0.43",
+        "@types/mocha": "^2.2.42"
+    },
+    "dependencies": {
+        "vscode-kubernetes-tools-api": "file:../../vscode-kubernetes-tools-api/vscode-kubernetes-tools-api-0.0.1.tgz"
+    },
+    "extensionDependencies": [
+        "ms-kubernetes-tools.vscode-kubernetes-tools"
+    ]
+}
