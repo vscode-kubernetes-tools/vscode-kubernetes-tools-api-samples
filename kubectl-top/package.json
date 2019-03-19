@@ -21,7 +21,15 @@
                 "title": "Show Resource Usage",
                 "category": "Kubernetes"
             }
-        ]
+        ],
+        "menus": {
+            "view/item/context": [
+                {
+                    "command": "k8stop.top",
+                    "when": "viewItem =~ /vsKubernetes\\.resource\\.(node|pod)/i"
+                }
+            ]
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
