@@ -6,6 +6,7 @@ to the Kubernetes cluster explorer.
 It demonstrates:
 
 * Adding nodes to the cluster explorer
+* Invoking kubectl
 
 # Contributing
 
