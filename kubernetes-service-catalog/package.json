@@ -84,7 +84,7 @@
         "@types/shelljs": "^0.8.3",
         "@types/yamljs": "^0.2.30",
         "shelljs": "^0.8.3",
-        "vscode-kubernetes-tools-api": "file:../../vscode-kubernetes-tools-api/vscode-kubernetes-tools-api-0.0.1.tgz",
+        "vscode-kubernetes-tools-api": "0.0.2",
         "yamljs": "^0.3.0"
     },
     "extensionDependencies": [
