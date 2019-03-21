@@ -11,16 +11,60 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "onCommand:svcat.addService",
+        "onCommand:svcat.removeService",
+        "onCommand:svcat.addExternalService",
+        "onCommand:svcat.removeExternalService",
+        "onView:extension.vsKubernetesExplorer"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.sayHello",
-                "title": "Hello World"
+                "command": "svcat.addService",
+                "title": "Add Service",
+                "category": "Kubernetes"
+            },
+            {
+                "command": "svcat.removeService",
+                "title": "Remove Service",
+                "category": "Kubernetes"
+            },
+            {
+                "command": "svcat.addExternalService",
+                "title": "Add External Service",
+                "category": "Kubernetes"
+            },
+            {
+                "command": "svcat.removeExternalService",
+                "title": "Remove External Service",
+                "category": "Kubernetes"
             }
-        ]
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "when": "explorerResourceIsFolder == true && resourceFilename == charts",
+                    "command": "svcat.addService",
+                    "group": "2_svcat@97"
+                },
+                {
+                    "when": "explorerResourceIsFolder == true && resourceFilename == charts",
+                    "command": "svcat.removeService",
+                    "group": "2_svcat@98"
+                },
+                {
+                    "when": "explorerResourceIsFolder == true && resourceFilename == charts",
+                    "command": "svcat.addExternalService",
+                    "group": "2_svcat@99"
+                },
+                {
+                    "when": "explorerResourceIsFolder == true && resourceFilename == charts",
+                    "command": "svcat.removeExternalService",
+                    "group": "2_svcat@100"
+                }
+            ]
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
@@ -33,11 +77,15 @@
         "typescript": "^2.6.1",
         "vscode": "^1.1.6",
         "tslint": "^5.8.0",
-        "@types/node": "^7.0.43",
+        "@types/node": "^10.2.0",
         "@types/mocha": "^2.2.42"
     },
     "dependencies": {
-        "vscode-kubernetes-tools-api": "file:../../vscode-kubernetes-tools-api/vscode-kubernetes-tools-api-0.0.1.tgz"
+        "@types/shelljs": "^0.8.3",
+        "@types/yamljs": "^0.2.30",
+        "shelljs": "^0.8.3",
+        "vscode-kubernetes-tools-api": "file:../../vscode-kubernetes-tools-api/vscode-kubernetes-tools-api-0.0.1.tgz",
+        "yamljs": "^0.3.0"
     },
     "extensionDependencies": [
         "ms-kubernetes-tools.vscode-kubernetes-tools"
