@@ -1,4 +1,6 @@
 import * as k8s from 'vscode-kubernetes-tools-api';
+import * as shelljs from 'shelljs';
+import { ChildProcess } from 'child_process';
 
 const KIND_CLUSTER_PROVIDER_ID = 'kind';
 
@@ -10,8 +12,8 @@ export const KIND_CLUSTER_PROVIDER: k8s.ClusterProviderV1.ClusterProvider = {
 };
 
 const PAGE_SETTINGS = 'settings';
-const PAGE_CREATE = 'create';
 
+const SETTING_CLUSTER_NAME = 'clustername';
 const SETTING_IMAGE_VERSION = 'imageversion';
 
 function onNext(wizard: k8s.ClusterProviderV1.Wizard, _action: k8s.ClusterProviderV1.ClusterProviderAction, message: any): void {
@@ -21,35 +23,69 @@ function onNext(wizard: k8s.ClusterProviderV1.Wizard, _action: k8s.ClusterProvid
     wizard.showPage(htmlPromise);
 }
 
-async function getPage(sendingStep: string, previousData: any): Promise<string> {
+function getPage(sendingStep: string, previousData: any): k8s.ClusterProviderV1.Sequence<string> {
     switch (sendingStep) {
         case k8s.ClusterProviderV1.SELECT_CLUSTER_TYPE_STEP_ID:
             return collectSettings(previousData);
         case PAGE_SETTINGS:
-            return await createCluster(previousData);
+            return createCluster(previousData);
         default:
             return "Internal error";
     }
 }
 
 function collectSettings(previousData: any): string {
+    const inputSettings = [
+        `<p>Cluster name: <input type='text' name='${SETTING_CLUSTER_NAME}' value='kind' /></p>`,
+        `<p>Image version: <input type='text' name='${SETTING_IMAGE_VERSION}' value='latest' /></p>`  // TODO: call Docker Hub for available versions, or use a freeform 'image' field to allow custom images
+    ];
     const html = formPage(
         PAGE_SETTINGS,
         "Cluster Settings",
-        `<p>Image version: <input type='text' name='${SETTING_IMAGE_VERSION}' value='latest' /></p>`,
+        inputSettings.join('\n'),
         "Create",
         previousData);
     return html;
 }
 
-function createCluster(previousData: any): string {
-    const html = formPage(
-        PAGE_CREATE,
-        "Cluster Created",
-        `<p>Ha ha!  Not really.  But if I had it would be version ${previousData[SETTING_IMAGE_VERSION]}</p>`,
-        null,
-        previousData);
-    return html;
+function createCluster(previousData: any): k8s.ClusterProviderV1.Observable<string> {
+    return {
+        subscribe(observer: k8s.ClusterProviderV1.Observer<string>): void {
+            observer.onNext("<h1>Creating local Kind cluster - please wait</h1>");
+            let stdout = '';
+            let stderr = '';
+            let title = 'Creating local Kind cluster - please wait';
+            function html() {
+                return `<h1>${title}</h1>${paragraphise(stdout)}${paragraphise(stderr, 'red')}`;
+            }
+            const clusterName: string = previousData[SETTING_CLUSTER_NAME];
+            const imageVersion: string = previousData[SETTING_IMAGE_VERSION];
+            const childProcess = shelljs.exec(`kind create cluster --name ${clusterName} --image kindest/node:${imageVersion}`, { async: true }) as ChildProcess;
+            childProcess.stdout.on('data', (chunk: string) => {
+                stdout += chunk;
+                observer.onNext(html());
+            });
+            childProcess.stderr.on('data', (chunk: string) => {
+                stderr += chunk;
+                observer.onNext(html());
+            });
+            childProcess.on('error', (err: Error) => {
+                stderr += err.message;
+                observer.onNext(html());
+            });
+            childProcess.on('exit', (code: number) => {
+                if (code === 0) {
+                    title = 'Cluster created';
+                    const createdMessage = `${html()}<p>Your local cluster has been created BUT HAS NOT BEEN set as active in your kubeconfig</p>`;  // TODO
+                    observer.onNext(createdMessage);
+                } else {
+                    title = 'Cluster creation failed';
+                    const failedMessage = html();
+                    observer.onNext(failedMessage);
+                }
+            });
+        }
+    };
 }
 
 function formPage(stepId: string, title: string, body: string, buttonCaption: string | null, previousData: any): string {
@@ -68,4 +104,11 @@ function formPage(stepId: string, title: string, body: string, buttonCaption: st
     `;
 
     return html;
+}
+
+function paragraphise(text: string, colour?: string): string {
+    const colourAttr = colour ? ` style='color:${colour}'` : '';
+    const lines = text.split('\n').map((l) => l.trim());
+    const paras = lines.map((l) => `<p${colourAttr}>${l}</p>`);
+    return paras.join('\n');
 }
