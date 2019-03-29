@@ -37,7 +37,7 @@ function getPage(sendingStep: string, previousData: any): k8s.ClusterProviderV1.
 function collectSettings(previousData: any): string {
     const inputSettings = [
         `<p>Cluster name: <input type='text' name='${SETTING_CLUSTER_NAME}' value='kind' /></p>`,
-        `<p>Image version: <input type='text' name='${SETTING_IMAGE_VERSION}' value='latest' /></p>`  // TODO: call Docker Hub for available versions, or use a freeform 'image' field to allow custom images
+        `<p>Image version (blank for default): <input type='text' name='${SETTING_IMAGE_VERSION}' value='' /></p>`  // TODO: call Docker Hub for available versions, or use a freeform 'image' field to allow custom images
     ];
     const html = formPage(
         PAGE_SETTINGS,
@@ -54,13 +54,15 @@ function createCluster(previousData: any): k8s.ClusterProviderV1.Observable<stri
             observer.onNext("<h1>Creating local Kind cluster - please wait</h1>");
             let stdout = '';
             let stderr = '';
+            let resultPara = '';
             let title = 'Creating local Kind cluster - please wait';
             function html() {
-                return `<h1>${title}</h1>${paragraphise(stdout)}${paragraphise(stderr, 'red')}`;
+                return `<h1>${title}</h1>${paragraphise(stdout)}${paragraphise(stderr, 'red')}${resultPara}`;
             }
             const clusterName: string = previousData[SETTING_CLUSTER_NAME];
             const imageVersion: string = previousData[SETTING_IMAGE_VERSION];
-            const childProcess = shelljs.exec(`kind create cluster --name ${clusterName} --image kindest/node:${imageVersion}`, { async: true }) as ChildProcess;
+            const imageArg = (imageVersion && imageVersion.length > 0) ? `--image kindest/node:${imageVersion}` : '';
+            const childProcess = shelljs.exec(`kind create cluster --name ${clusterName} ${imageArg}`, { async: true }) as ChildProcess;
             childProcess.stdout.on('data', (chunk: string) => {
                 stdout += chunk;
                 observer.onNext(html());
@@ -76,12 +78,12 @@ function createCluster(previousData: any): k8s.ClusterProviderV1.Observable<stri
             childProcess.on('exit', (code: number) => {
                 if (code === 0) {
                     title = 'Cluster created';
-                    const createdMessage = `${html()}<p>Your local cluster has been created BUT HAS NOT BEEN set as active in your kubeconfig</p>`;  // TODO
-                    observer.onNext(createdMessage);
+                    resultPara = `<p style='font-weight: bold; color: lightgreen'>Your local cluster has been created BUT HAS NOT BEEN set as active in your kubeconfig</p>`;  // TODO
+                    observer.onNext(html());
                 } else {
                     title = 'Cluster creation failed';
-                    const failedMessage = html();
-                    observer.onNext(failedMessage);
+                    resultPara = `<p style='font-weight: bold; color: red'>Your local cluster was not created.  See tool output above for why.</p>`;
+                    observer.onNext(html());
                 }
             });
         }
