@@ -78,8 +78,15 @@ function createCluster(previousData: any): k8s.ClusterProviderV1.Observable<stri
             childProcess.on('exit', (code: number) => {
                 if (code === 0) {
                     title = 'Cluster created';
-                    resultPara = `<p style='font-weight: bold; color: lightgreen'>Your local cluster has been created BUT HAS NOT BEEN set as active in your kubeconfig</p>`;  // TODO
+                    resultPara = `<p style='font-weight: bold; color: lightgreen'>Your local cluster has been created BUT HAS NOT BEEN set as active in your kubeconfig</p>`;
                     observer.onNext(html());
+                    shelljs.exec(`kind get kubeconfig-path --name ${clusterName}`, { async: true }, (code, pStdout, _pStderr) => {
+                        if (code === 0) {
+                            const kcpath = pStdout.trim();
+                            resultPara = `<p style='font-weight: bold; color: lightgreen'>Your local cluster has been created and its kubeconfig is at ${kcpath}. To work with your cluster, switch to this kubeconfig, or copy settings from this file to your main kubeconfig.</p>`;
+                            observer.onNext(html());
+                        }
+                    });
                 } else {
                     title = 'Cluster creation failed';
                     resultPara = `<p style='font-weight: bold; color: red'>Your local cluster was not created.  See tool output above for why.</p>`;
