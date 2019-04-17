@@ -1,0 +1,93 @@
+{
+    "name": "kubernetes-service-catalog",
+    "displayName": "kubernetes-service-catalog",
+    "description": "Service Catalog support for Kubernetes",
+    "version": "0.0.1",
+    "publisher": "ms-kubernetes-tools",
+    "engines": {
+        "vscode": "^1.32.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:svcat.addService",
+        "onCommand:svcat.removeService",
+        "onCommand:svcat.addExternalService",
+        "onCommand:svcat.removeExternalService",
+        "onView:extension.vsKubernetesExplorer"
+    ],
+    "main": "./out/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "svcat.addService",
+                "title": "Add Service",
+                "category": "Kubernetes"
+            },
+            {
+                "command": "svcat.removeService",
+                "title": "Remove Service",
+                "category": "Kubernetes"
+            },
+            {
+                "command": "svcat.addExternalService",
+                "title": "Add External Service",
+                "category": "Kubernetes"
+            },
+            {
+                "command": "svcat.removeExternalService",
+                "title": "Remove External Service",
+                "category": "Kubernetes"
+            }
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "when": "explorerResourceIsFolder == true && resourceFilename == charts",
+                    "command": "svcat.addService",
+                    "group": "2_svcat@97"
+                },
+                {
+                    "when": "explorerResourceIsFolder == true && resourceFilename == charts",
+                    "command": "svcat.removeService",
+                    "group": "2_svcat@98"
+                },
+                {
+                    "when": "explorerResourceIsFolder == true && resourceFilename == charts",
+                    "command": "svcat.addExternalService",
+                    "group": "2_svcat@99"
+                },
+                {
+                    "when": "explorerResourceIsFolder == true && resourceFilename == charts",
+                    "command": "svcat.removeExternalService",
+                    "group": "2_svcat@100"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.6",
+        "tslint": "^5.8.0",
+        "@types/node": "^10.2.0",
+        "@types/mocha": "^2.2.42"
+    },
+    "dependencies": {
+        "@types/shelljs": "^0.8.3",
+        "@types/yamljs": "^0.2.30",
+        "shelljs": "^0.8.3",
+        "vscode-kubernetes-tools-api": "0.0.2",
+        "yamljs": "^0.3.0"
+    },
+    "extensionDependencies": [
+        "ms-kubernetes-tools.vscode-kubernetes-tools"
+    ]
+}
