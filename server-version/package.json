@@ -30,7 +30,7 @@
         "@types/mocha": "^2.2.42"
     },
     "dependencies": {
-        "vscode-kubernetes-tools-api": "file:../../vscode-kubernetes-tools-api/vscode-kubernetes-tools-api-0.0.6.tgz"
+        "vscode-kubernetes-tools-api": "^0.0.6"
     },
     "extensionDependencies": [
         "ms-kubernetes-tools.vscode-kubernetes-tools"
