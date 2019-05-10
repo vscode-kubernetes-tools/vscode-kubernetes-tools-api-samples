@@ -34,7 +34,7 @@ async function clusterVersion(contextName: string): Promise<string> {
         return '';
     }
 
-    const kubectlPromise = kubectl.api.invokeCommand(`version -o json --context ${contextName} --request-timeout=10s`);
+    const kubectlPromise = kubectl.api.invokeCommand(`version --output json --context ${contextName} --request-timeout=10s`);
     const timeoutPromise = after<'timedout'>(10000, 'timedout');  // --request-timeout doesn't help if kubectl blocks with an interactive auth prompt
     const sr = await Promise.race([kubectlPromise, timeoutPromise]);
     if (sr === 'timedout' || !sr || sr.code !== 0) {
