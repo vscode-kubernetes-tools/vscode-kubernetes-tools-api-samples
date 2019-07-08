@@ -1,7 +1,7 @@
 {
     "name": "kind-cluster-provider",
     "displayName": "kind-cluster-provider",
-    "description": "Adds Kind support to the Kubernetes extension cluster wizard",
+    "description": "Adds Kind support to the Kubernetes extension",
     "version": "0.0.1",
     "publisher": "ms-kubernetes-tools",
     "engines": {
@@ -12,7 +12,8 @@
     ],
     "activationEvents": [
         "onCommand:extension.vsKubernetesConfigureFromCluster",
-        "onCommand:extension.vsKubernetesCreateCluster"
+        "onCommand:extension.vsKubernetesCreateCluster",
+        "onView:kubernetes.cloudExplorer"
     ],
     "main": "./out/extension",
     "contributes": {},
