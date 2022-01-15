@@ -36,7 +36,7 @@
         "@types/shelljs": "^0.8.3"
     },
     "dependencies": {
-        "shelljs": "^0.8.3",
+        "shelljs": "^0.8.5",
         "vscode-kubernetes-tools-api": "^1.0.0"
     }
 }
